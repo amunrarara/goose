@@ -1,4 +1,5 @@
-use mcp_core::{Tool, ToolError};
+use mcp_core::{ToolError};
+use rmcp::model::Tool;
 use rmcp::model::Content;
 use serde_json::Value;
 use std::collections::HashMap;

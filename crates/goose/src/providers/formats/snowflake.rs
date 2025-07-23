@@ -3,8 +3,8 @@ use crate::model::ModelConfig;
 use crate::providers::base::Usage;
 use crate::providers::errors::ProviderError;
 use anyhow::{anyhow, Result};
-use mcp_core::tool::{Tool, ToolCall};
-use rmcp::model::Role;
+use mcp_core::tool::{ToolCall};
+use rmcp::model::{Role, Tool};
 use serde_json::{json, Value};
 use std::collections::HashSet;
 
@@ -358,6 +358,7 @@ pub fn create_request(
 
 #[cfg(test)]
 mod tests {
+    use rmcp::object;
     use super::*;
     use serde_json::json;
 
@@ -460,7 +461,7 @@ mod tests {
             Tool::new(
                 "calculator",
                 "Calculate mathematical expressions",
-                json!({
+                object!({
                     "type": "object",
                     "properties": {
                         "expression": {
@@ -468,13 +469,12 @@ mod tests {
                             "description": "The mathematical expression to evaluate"
                         }
                     }
-                }),
-                None,
+                })
             ),
             Tool::new(
                 "weather",
                 "Get weather information",
-                json!({
+                object!({
                     "type": "object",
                     "properties": {
                         "location": {
@@ -482,8 +482,7 @@ mod tests {
                             "description": "The location to get weather for"
                         }
                     }
-                }),
-                None,
+                })
             ),
         ];
 
@@ -557,7 +556,7 @@ data: {"id":"a9537c2c-2017-4906-9817-2456168d89fa","model":"claude-3-5-sonnet","
         let tools = vec![Tool::new(
             "get_stock_price",
             "Get stock price information",
-            json!({
+            object!({
                 "type": "object",
                 "properties": {
                     "symbol": {
@@ -566,8 +565,7 @@ data: {"id":"a9537c2c-2017-4906-9817-2456168d89fa","model":"claude-3-5-sonnet","
                     }
                 },
                 "required": ["symbol"]
-            }),
-            None,
+            })
         )];
 
         let request = create_request(&model_config, system, &messages, &tools)?;

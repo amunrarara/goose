@@ -1,10 +1,10 @@
 use anyhow::Result;
 use mcp_core::handler::{PromptError, ResourceError};
-use mcp_core::tool::ToolAnnotations;
-use mcp_core::{handler::ToolError, protocol::ServerCapabilities, tool::Tool};
+use mcp_core::{handler::ToolError, protocol::ServerCapabilities};
 use mcp_server::router::{CapabilitiesBuilder, RouterService};
 use mcp_server::{ByteTransport, Router, Server};
-use rmcp::model::{Content, JsonRpcMessage, Prompt, PromptArgument, RawResource, Resource};
+use rmcp::model::{Content, JsonRpcMessage, Prompt, PromptArgument, RawResource, Resource, Tool, ToolAnnotations};
+use rmcp::object;
 use serde_json::Value;
 use std::{future::Future, pin::Pin, sync::Arc};
 use tokio::sync::mpsc;
@@ -72,51 +72,48 @@ impl Router for CounterRouter {
             Tool::new(
                 "increment".to_string(),
                 "Increment the counter by 1".to_string(),
-                serde_json::json!({
+                object!({
                     "type": "object",
                     "properties": {},
                     "required": []
-                }),
-                Some(ToolAnnotations {
-                    title: Some("Increment Tool".to_string()),
-                    read_only_hint: false,
-                    destructive_hint: false,
-                    idempotent_hint: false,
-                    open_world_hint: false,
-                }),
-            ),
+                })
+            ).annotate(ToolAnnotations {
+                title: Some("Increment Tool".to_string()),
+                read_only_hint: Option::from(false),
+                destructive_hint: Option::from(false),
+                idempotent_hint: Option::from(false),
+                open_world_hint: Option::from(false),
+            }),
             Tool::new(
                 "decrement".to_string(),
                 "Decrement the counter by 1".to_string(),
-                serde_json::json!({
+                object!({
                     "type": "object",
                     "properties": {},
                     "required": []
-                }),
-                Some(ToolAnnotations {
-                    title: Some("Decrement Tool".to_string()),
-                    read_only_hint: false,
-                    destructive_hint: false,
-                    idempotent_hint: false,
-                    open_world_hint: false,
-                }),
-            ),
+                })
+            ).annotate(ToolAnnotations {
+                title: Some("Decrement Tool".to_string()),
+                read_only_hint: Option::from(false),
+                destructive_hint: Option::from(false),
+                idempotent_hint: Option::from(false),
+                open_world_hint: Option::from(false),
+            }),
             Tool::new(
                 "get_value".to_string(),
                 "Get the current counter value".to_string(),
-                serde_json::json!({
+                object!({
                     "type": "object",
                     "properties": {},
                     "required": []
-                }),
-                Some(ToolAnnotations {
-                    title: Some("Get Value Tool".to_string()),
-                    read_only_hint: true,
-                    destructive_hint: false,
-                    idempotent_hint: false,
-                    open_world_hint: false,
-                }),
-            ),
+                })
+            ).annotate(ToolAnnotations {
+                title: Some("Get Value Tool".to_string()),
+                read_only_hint: Option::from(true),
+                destructive_hint: Option::from(false),
+                idempotent_hint: Option::from(false),
+                open_world_hint: Option::from(false),
+            })
         ]
     }
 

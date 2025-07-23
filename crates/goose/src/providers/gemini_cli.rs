@@ -11,7 +11,7 @@ use super::errors::ProviderError;
 use super::utils::emit_debug_trace;
 use crate::message::{Message, MessageContent};
 use crate::model::ModelConfig;
-use mcp_core::tool::Tool;
+use rmcp::model::Tool;
 use rmcp::model::Role;
 
 pub const GEMINI_CLI_DEFAULT_MODEL: &str = "gemini-2.5-pro";

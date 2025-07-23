@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::fs;
 
 use anyhow::Result;
-use mcp_core::tool::{Tool, ToolAnnotations};
+use rmcp::model::{Tool, ToolAnnotations};
 use serde_json::{json, Map, Value};
 
 use crate::agents::subagent_execution_tool::lib::{ExecutionMode, Task};
@@ -15,7 +15,7 @@ pub const SUB_RECIPE_TASK_TOOL_NAME_PREFIX: &str = "subrecipe__create_task";
 
 pub fn create_sub_recipe_task_tool(sub_recipe: &SubRecipe) -> Tool {
     let input_schema = get_input_schema(sub_recipe).unwrap();
-    Tool::new(
+    let tool = Tool::new(
         format!("{}_{}", SUB_RECIPE_TASK_TOOL_NAME_PREFIX, sub_recipe.name),
         format!(
             "Create one or more tasks to run the '{}' sub recipe. \
@@ -27,15 +27,16 @@ pub fn create_sub_recipe_task_tool(sub_recipe: &SubRecipe) -> Tool {
             After creating the tasks and execution_mode is provided, pass them to the task executor to run these tasks",
             sub_recipe.name
         ),
-        input_schema,
-        Some(ToolAnnotations {
-            title: Some(format!("create multiple sub recipe tasks for {}", sub_recipe.name)),
-            read_only_hint: false,
-            destructive_hint: true,
-            idempotent_hint: false,
-            open_world_hint: true,
-        }),
-    )
+        input_schema
+    );
+
+    tool.annotate(ToolAnnotations {
+        title: Some(format!("create multiple sub recipe tasks for {}", sub_recipe.name)),
+        read_only_hint: Option::from(false),
+        destructive_hint: Option::from(true),
+        idempotent_hint: Option::from(false),
+        open_world_hint: Option::from(true),
+    })
 }
 
 fn extract_task_parameters(params: &Value) -> Vec<Value> {

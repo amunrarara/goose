@@ -7,7 +7,7 @@ use goose::providers::{
     anthropic, azure, bedrock, databricks, google, groq, litellm, ollama, openai, openrouter,
     snowflake, xai,
 };
-use mcp_core::tool::Tool;
+use rmcp::model::Tool;
 use rmcp::model::{AnnotateAble, Content, RawImageContent};
 use std::collections::HashMap;
 use std::sync::Arc;

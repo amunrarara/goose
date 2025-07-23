@@ -5,10 +5,8 @@ use crate::providers::utils::{
     sanitize_function_name, ImageFormat,
 };
 use anyhow::{anyhow, Error};
-use mcp_core::ToolError;
-use mcp_core::{Tool, ToolCall};
-use rmcp::model::Role;
-use rmcp::model::{AnnotateAble, Content, RawContent, ResourceContents};
+use mcp_core::{ToolCall, ToolError};
+use rmcp::model::{AnnotateAble, Content, RawContent, ResourceContents, Role, Tool};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 

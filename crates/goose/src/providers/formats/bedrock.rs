@@ -6,8 +6,8 @@ use aws_sdk_bedrockruntime::types as bedrock;
 use aws_smithy_types::{Document, Number};
 use base64::Engine;
 use chrono::Utc;
-use mcp_core::{Tool, ToolCall, ToolError, ToolResult};
-use rmcp::model::{Content, RawContent, ResourceContents, Role};
+use mcp_core::{ToolCall, ToolError, ToolResult};
+use rmcp::model::{Content, RawContent, ResourceContents, Role, Tool};
 use serde_json::Value;
 
 use super::super::base::Usage;

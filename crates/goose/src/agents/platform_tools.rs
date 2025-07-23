@@ -1,6 +1,6 @@
 use indoc::indoc;
-use mcp_core::tool::{Tool, ToolAnnotations};
-use serde_json::json;
+use rmcp::model::{Tool, ToolAnnotations};
+use rmcp::object;
 
 pub const PLATFORM_READ_RESOURCE_TOOL_NAME: &str = "platform__read_resource";
 pub const PLATFORM_LIST_RESOURCES_TOOL_NAME: &str = "platform__list_resources";
@@ -10,7 +10,7 @@ pub const PLATFORM_MANAGE_EXTENSIONS_TOOL_NAME: &str = "platform__manage_extensi
 pub const PLATFORM_MANAGE_SCHEDULE_TOOL_NAME: &str = "platform__manage_schedule";
 
 pub fn read_resource_tool() -> Tool {
-    Tool::new(
+    let tool = Tool::new(
         PLATFORM_READ_RESOURCE_TOOL_NAME.to_string(),
         indoc! {r#"
             Read a resource from an extension.
@@ -20,26 +20,27 @@ pub fn read_resource_tool() -> Tool {
             resource URI in the provided extension, and reads in the resource content. If no extension
             is provided, the tool will search all extensions for the resource.
         "#}.to_string(),
-        json!({
+        object!({
             "type": "object",
             "required": ["uri"],
             "properties": {
                 "uri": {"type": "string", "description": "Resource URI"},
                 "extension_name": {"type": "string", "description": "Optional extension name"}
             }
-        }),
-        Some(ToolAnnotations {
-            title: Some("Read a resource".to_string()),
-            read_only_hint: true,
-            destructive_hint: false,
-            idempotent_hint: false,
-            open_world_hint: false,
-        }),
-    )
+        })
+    );
+
+    tool.annotate(ToolAnnotations {
+        title: Some("Read a resource".to_string()),
+        read_only_hint: Option::from(true),
+        destructive_hint: Option::from(false),
+        idempotent_hint: Option::from(false),
+        open_world_hint: Option::from(false),
+    })
 }
 
 pub fn list_resources_tool() -> Tool {
-    Tool::new(
+    let tool = Tool::new(
         PLATFORM_LIST_RESOURCES_TOOL_NAME.to_string(),
         indoc! {r#"
             List resources from an extension(s).
@@ -49,73 +50,76 @@ pub fn list_resources_tool() -> Tool {
             in the provided extension, and returns a list for the user to browse. If no extension
             is provided, the tool will search all extensions for the resource.
         "#}
-        .to_string(),
-        json!({
+            .to_string(),
+        object!({
             "type": "object",
             "properties": {
                 "extension_name": {"type": "string", "description": "Optional extension name"}
             }
-        }),
-        Some(ToolAnnotations {
-            title: Some("List resources".to_string()),
-            read_only_hint: true,
-            destructive_hint: false,
-            idempotent_hint: false,
-            open_world_hint: false,
-        }),
-    )
+        })
+    );
+
+    tool.annotate(ToolAnnotations {
+        title: Some("List resources".to_string()),
+        read_only_hint: Option::from(true),
+        destructive_hint: Option::from(false),
+        idempotent_hint: Option::from(false),
+        open_world_hint: Option::from(false),
+    })
 }
 
 pub fn search_available_extensions_tool() -> Tool {
-    Tool::new(
+    let tool = Tool::new(
         PLATFORM_SEARCH_AVAILABLE_EXTENSIONS_TOOL_NAME.to_string(),
         "Searches for additional extensions available to help complete tasks.
         Use this tool when you're unable to find a specific feature or functionality you need to complete your task, or when standard approaches aren't working.
         These extensions might provide the exact tools needed to solve your problem.
         If you find a relevant one, consider using your tools to enable it.".to_string(),
-        json!({
+        object!({
             "type": "object",
             "required": [],
             "properties": {}
-        }),
-        Some(ToolAnnotations {
-            title: Some("Discover extensions".to_string()),
-            read_only_hint: true,
-            destructive_hint: false,
-            idempotent_hint: false,
-            open_world_hint: false,
-        }),
-    )
+        })
+    );
+
+    tool.annotate(ToolAnnotations {
+        title: Some("Discover extensions".to_string()),
+        read_only_hint: Option::from(true),
+        destructive_hint: Option::from(false),
+        idempotent_hint: Option::from(false),
+        open_world_hint: Option::from(false),
+    })
 }
 
 pub fn manage_extensions_tool() -> Tool {
-    Tool::new(
+    let tool = Tool::new(
         PLATFORM_MANAGE_EXTENSIONS_TOOL_NAME.to_string(),
         "Tool to manage extensions and tools in goose context.
             Enable or disable extensions to help complete tasks.
             Enable or disable an extension by providing the extension name.
             "
         .to_string(),
-        json!({
+        object!({
             "type": "object",
             "required": ["action", "extension_name"],
             "properties": {
                 "action": {"type": "string", "description": "The action to perform", "enum": ["enable", "disable"]},
                 "extension_name": {"type": "string", "description": "The name of the extension to enable"}
             }
-        }),
-        Some(ToolAnnotations {
-            title: Some("Enable or disable an extension".to_string()),
-            read_only_hint: false,
-            destructive_hint: false,
-            idempotent_hint: false,
-            open_world_hint: false,
-        }),
-    )
+        })
+    );
+
+    tool.annotate(ToolAnnotations {
+        title: Some("Enable or disable an extension".to_string()),
+        read_only_hint: Option::from(false),
+        destructive_hint: Option::from(false),
+        idempotent_hint: Option::from(false),
+        open_world_hint: Option::from(false),
+    })
 }
 
 pub fn manage_schedule_tool() -> Tool {
-    Tool::new(
+    let tool = Tool::new(
         PLATFORM_MANAGE_SCHEDULE_TOOL_NAME.to_string(),
         indoc! {r#"
             Manage scheduled recipe execution for this Goose instance.
@@ -133,7 +137,7 @@ pub fn manage_schedule_tool() -> Tool {
             - "session_content": Get the full content (messages) of a specific session
         "#}
         .to_string(),
-        json!({
+        object!({
             "type": "object",
             "required": ["action"],
             "properties": {
@@ -148,13 +152,13 @@ pub fn manage_schedule_tool() -> Tool {
                 "limit": {"type": "integer", "description": "Limit for sessions list", "default": 50},
                 "session_id": {"type": "string", "description": "Session identifier for session_content action"}
             }
-        }),
-        Some(ToolAnnotations {
-            title: Some("Manage scheduled recipes".to_string()),
-            read_only_hint: false,
-            destructive_hint: true, // Can kill jobs
-            idempotent_hint: false,
-            open_world_hint: false,
-        }),
-    )
+        })
+    );
+    tool.annotate(ToolAnnotations {
+        title: Some("Manage scheduled recipes".to_string()),
+        read_only_hint: Option::from(false),
+        destructive_hint: Option::from(true), // Can kill jobs
+        idempotent_hint: Option::from(false),
+        open_world_hint: Option::from(false),
+    })
 }

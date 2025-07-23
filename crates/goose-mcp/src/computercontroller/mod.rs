@@ -2,7 +2,7 @@ use base64::Engine;
 use etcetera::{choose_app_strategy, AppStrategy};
 use indoc::{formatdoc, indoc};
 use reqwest::{Client, Url};
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::{
     collections::HashMap, fs, future::Future, path::PathBuf, pin::Pin, sync::Arc, sync::Mutex,
 };
@@ -13,12 +13,12 @@ use std::os::unix::fs::PermissionsExt;
 
 use mcp_core::{
     handler::{PromptError, ResourceError, ToolError},
-    protocol::ServerCapabilities,
-    tool::{Tool, ToolAnnotations},
+    protocol::ServerCapabilities
 };
 use mcp_server::router::CapabilitiesBuilder;
 use mcp_server::Router;
-use rmcp::model::{AnnotateAble, Content, JsonRpcMessage, Prompt, RawResource, Resource};
+use rmcp::model::{AnnotateAble, Content, JsonRpcMessage, Prompt, RawResource, Resource, Tool, ToolAnnotations};
+use rmcp::object;
 
 mod docx_tool;
 mod pdf_tool;
@@ -58,7 +58,7 @@ impl ComputerControllerRouter {
                 The content is cached locally and can be accessed later using the cache_path
                 returned in the response.
             "#},
-            json!({
+            object!({
                 "type": "object",
                 "required": ["url"],
                 "properties": {
@@ -73,15 +73,14 @@ impl ComputerControllerRouter {
                         "description": "How to interpret and save the content"
                     }
                 }
-            }),
-            Some(ToolAnnotations {
-                title: Some("Web Scrape".to_string()),
-                read_only_hint: true,
-                destructive_hint: false,
-                idempotent_hint: false,
-                open_world_hint: true,
-            }),
-        );
+            })
+        ).annotate(ToolAnnotations {
+            title: Some("Web Scrape".to_string()),
+            read_only_hint: Option::from(true),
+            destructive_hint: Option::from(false),
+            idempotent_hint: Option::from(false),
+            open_world_hint: Option::from(true),
+        });
 
         let computer_control_desc = match std::env::consts::OS {
             "windows" => indoc! {r#"
@@ -131,7 +130,7 @@ impl ComputerControllerRouter {
         let computer_control_tool = Tool::new(
             "computer_control",
             computer_control_desc.to_string(),
-            json!({
+            object!({
                 "type": "object",
                 "required": ["script"],
                 "properties": {
@@ -145,8 +144,7 @@ impl ComputerControllerRouter {
                         "description": "Whether to save the script output to a file"
                     }
                 }
-            }),
-            None,
+            })
         );
 
         let quick_script_desc = match std::env::consts::OS {
@@ -177,7 +175,7 @@ impl ComputerControllerRouter {
         let quick_script_tool = Tool::new(
             "automation_script",
             quick_script_desc.to_string(),
-            json!({
+            object!({
                 "type": "object",
                 "required": ["language", "script"],
                 "properties": {
@@ -196,8 +194,7 @@ impl ComputerControllerRouter {
                         "description": "Whether to save the script output to a file"
                     }
                 }
-            }),
-            None,
+            })
         );
 
         let cache_tool = Tool::new(
@@ -209,7 +206,7 @@ impl ComputerControllerRouter {
                 - delete: Delete a cached file
                 - clear: Clear all cached files
             "#},
-            json!({
+            object!({
                 "type": "object",
                 "required": ["command"],
                 "properties": {
@@ -223,8 +220,7 @@ impl ComputerControllerRouter {
                         "description": "Path to the cached file for view/delete commands"
                     }
                 }
-            }),
-            None,
+            })
         );
 
         let pdf_tool = Tool::new(
@@ -237,7 +233,7 @@ impl ComputerControllerRouter {
 
                 Use this when there is a .pdf file or files that need to be processed.
             "#},
-            json!({
+            object!({
                 "type": "object",
                 "required": ["path", "operation"],
                 "properties": {
@@ -251,15 +247,14 @@ impl ComputerControllerRouter {
                         "description": "Operation to perform on the PDF"
                     }
                 }
-            }),
-            Some(ToolAnnotations {
-                title: Some("PDF process".to_string()),
-                read_only_hint: true,
-                destructive_hint: false,
-                idempotent_hint: true,
-                open_world_hint: false,
-            }),
-        );
+            })
+        ).annotate(ToolAnnotations {
+            title: Some("PDF process".to_string()),
+            read_only_hint: Option::from(true),
+            destructive_hint: Option::from(false),
+            idempotent_hint: Option::from(true),
+            open_world_hint: Option::from(false),
+        });
 
         let docx_tool = Tool::new(
             "docx_tool",
@@ -276,7 +271,7 @@ impl ComputerControllerRouter {
 
                 Use this when there is a .docx file that needs to be processed or created.
             "#},
-            json!({
+            object!({
                 "type": "object",
                 "required": ["path", "operation"],
                 "properties": {
@@ -356,8 +351,7 @@ impl ComputerControllerRouter {
                         }
                     }
                 }
-            }),
-            None,
+            })
         );
 
         let xlsx_tool = Tool::new(
@@ -375,7 +369,7 @@ impl ComputerControllerRouter {
 
                 Use this when working with Excel spreadsheets to analyze or modify data.
             "#},
-            json!({
+            object!({
                 "type": "object",
                 "required": ["path", "operation"],
                 "properties": {
@@ -418,8 +412,7 @@ impl ComputerControllerRouter {
                         "description": "New value for update_cell operation"
                     }
                 }
-            }),
-            None,
+            })
         );
 
         // choose_app_strategy().cache_dir()

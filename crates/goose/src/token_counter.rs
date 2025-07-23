@@ -1,6 +1,6 @@
 use ahash::AHasher;
 use dashmap::DashMap;
-use mcp_core::Tool;
+use rmcp::model::Tool;
 use std::hash::{Hash, Hasher};
 use std::sync::Arc;
 use tiktoken_rs::CoreBPE;
@@ -371,7 +371,7 @@ pub async fn create_async_token_counter() -> Result<AsyncTokenCounter, String> {
 mod tests {
     use super::*;
     use crate::message::{Message, MessageContent};
-    use mcp_core::tool::Tool;
+    use rmcp::model::Tool;
     use rmcp::model::Role;
     use serde_json::json;
 

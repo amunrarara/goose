@@ -42,7 +42,8 @@ use crate::providers::errors::ProviderError;
 use crate::recipe::{Author, Recipe, Response, Settings, SubRecipe};
 use crate::scheduler_trait::SchedulerTrait;
 use crate::tool_monitor::{ToolCall, ToolMonitor};
-use mcp_core::{protocol::GetPromptResult, tool::Tool, ToolError, ToolResult};
+use mcp_core::{protocol::GetPromptResult, ToolError, ToolResult};
+use rmcp::model::Tool;
 use regex::Regex;
 use rmcp::model::{Content, JsonRpcMessage, Prompt};
 use serde_json::Value;
@@ -546,10 +547,10 @@ impl Agent {
                 let mut frontend_tools = self.frontend_tools.lock().await;
                 for tool in tools {
                     let frontend_tool = FrontendTool {
-                        name: tool.name.clone(),
+                        name: tool.name.clone().parse().unwrap(),
                         tool: tool.clone(),
                     };
-                    frontend_tools.insert(tool.name.clone(), frontend_tool);
+                    frontend_tools.insert(tool.name.clone().parse().unwrap(), frontend_tool);
                 }
                 // Store instructions if provided, using "frontend" as the key
                 let mut frontend_instructions = self.frontend_instructions.lock().await;
@@ -1219,7 +1220,7 @@ impl Agent {
             .map(|tool| {
                 ToolInfo::new(
                     &tool.name,
-                    &tool.description,
+                    &tool.description.unwrap_or_default(),
                     get_parameter_names(&tool),
                     None,
                 )

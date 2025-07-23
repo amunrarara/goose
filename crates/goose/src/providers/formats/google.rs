@@ -4,9 +4,9 @@ use crate::providers::base::Usage;
 use crate::providers::errors::ProviderError;
 use crate::providers::utils::{is_valid_function_name, sanitize_function_name};
 use anyhow::Result;
-use mcp_core::tool::{Tool, ToolCall};
+use mcp_core::tool::ToolCall;
 use rand::{distributions::Alphanumeric, Rng};
-use rmcp::model::{AnnotateAble, RawContent, Role};
+use rmcp::model::{AnnotateAble, RawContent, Role, Tool};
 use serde_json::{json, Map, Value};
 use std::ops::Deref;
 
@@ -132,7 +132,7 @@ pub fn format_tools(tools: &[Tool]) -> Vec<Value> {
             let mut parameters = Map::new();
             parameters.insert("name".to_string(), json!(tool.name));
             parameters.insert("description".to_string(), json!(tool.description));
-            if let Some(tool_input_schema) = tool.input_schema.as_object() {
+            if let Some(tool_input_schema) = tool.input_schema {
                 // Only add the parameters key if the tool schema has non-empty properties.
                 if tool_input_schema
                     .get("properties")

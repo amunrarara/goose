@@ -548,7 +548,7 @@ mod final_output_tool_tests {
         use goose::model::ModelConfig;
         use goose::providers::base::{Provider, ProviderUsage, Usage};
         use goose::providers::errors::ProviderError;
-        use mcp_core::tool::Tool;
+        use rmcp::model::Tool;
 
         #[derive(Clone)]
         struct MockProvider {
@@ -648,7 +648,7 @@ mod final_output_tool_tests {
         use goose::model::ModelConfig;
         use goose::providers::base::{Provider, ProviderUsage};
         use goose::providers::errors::ProviderError;
-        use mcp_core::tool::Tool;
+        use rmcp::model::Tool;
 
         #[derive(Clone)]
         struct MockProvider {
@@ -769,7 +769,7 @@ mod retry_tests {
     use goose::model::ModelConfig;
     use goose::providers::base::{Provider, ProviderUsage, Usage};
     use goose::providers::errors::ProviderError;
-    use mcp_core::tool::Tool;
+    use rmcp::model::Tool;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::Arc;
 
@@ -950,7 +950,8 @@ mod max_turns_tests {
     use goose::providers::base::{Provider, ProviderMetadata, ProviderUsage, Usage};
     use goose::providers::errors::ProviderError;
     use goose::session::storage::Identifier;
-    use mcp_core::tool::{Tool, ToolCall};
+    use mcp_core::tool::ToolCall;
+    use rmcp::model::Tool;
     use std::path::PathBuf;
 
     struct MockToolProvider {}

@@ -19,8 +19,8 @@ use crate::config::{Config, ExtensionConfigManager};
 use crate::prompt_template;
 use mcp_client::client::{ClientCapabilities, ClientInfo, McpClient, McpClientTrait};
 use mcp_client::transport::{SseTransport, StdioTransport, StreamableHttpTransport, Transport};
-use mcp_core::{Tool, ToolCall, ToolError};
-use rmcp::model::{Content, Prompt, Resource, ResourceContents};
+use mcp_core::{ToolCall, ToolError};
+use rmcp::model::{Content, Tool, Prompt, Resource, ResourceContents};
 use serde_json::Value;
 
 // By default, we set it to Jan 1, 2020 if the resource does not have a timestamp
@@ -381,12 +381,17 @@ impl ExtensionManager {
 
                 loop {
                     for tool in client_tools.tools {
-                        tools.push(Tool::new(
+                        let mut maybe_annotated_tool = Tool::new(
                             format!("{}__{}", name, tool.name),
-                            &tool.description,
-                            tool.input_schema,
-                            tool.annotations,
-                        ));
+                            tool.description.unwrap_or_default(),
+                            tool.input_schema
+                        );
+
+                        if tool.annotations.is_some() {
+                            maybe_annotated_tool = maybe_annotated_tool.annotate(tool.annotations.unwrap())
+                        }
+
+                        tools.push(maybe_annotated_tool);
                     }
 
                     // Exit loop when there are no more pages

@@ -3,13 +3,13 @@ use include_dir::{include_dir, Dir};
 use indoc::formatdoc;
 use mcp_core::{
     handler::{PromptError, ResourceError, ToolError},
-    protocol::ServerCapabilities,
-    tool::{Tool, ToolAnnotations},
+    protocol::ServerCapabilities
 };
 use mcp_server::router::CapabilitiesBuilder;
 use mcp_server::Router;
-use rmcp::model::{Content, JsonRpcMessage, Prompt, Resource, Role};
-use serde_json::{json, Value};
+use rmcp::model::{Content, JsonRpcMessage, Prompt, Resource, Role, Tool, ToolAnnotations};
+use rmcp::object;
+use serde_json::Value;
 use std::{future::Future, pin::Pin};
 use tokio::sync::mpsc;
 
@@ -31,7 +31,7 @@ impl TutorialRouter {
         let load_tutorial = Tool::new(
             "load_tutorial".to_string(),
             "Load a specific tutorial by name. The tutorial will be returned as markdown content that provides step by step instructions.".to_string(),
-            json!({
+            object!({
                 "type": "object",
                 "required": ["name"],
                 "properties": {
@@ -40,15 +40,14 @@ impl TutorialRouter {
                         "description": "Name of the tutorial to load, e.g. 'getting-started' or 'developer-mcp'"
                     }
                 }
-            }),
-            Some(ToolAnnotations {
-                    title: Some("Load Tutorial".to_string()),
-                    read_only_hint: true,
-                    destructive_hint: false,
-                    idempotent_hint: false,
-                    open_world_hint: false,
-                }),
-        );
+            })
+        ).annotate(ToolAnnotations {
+            title: Some("Load Tutorial".to_string()),
+            read_only_hint: Option::from(true),
+            destructive_hint: Option::from(false),
+            idempotent_hint: Option::from(false),
+            open_world_hint: Option::from(false),
+        });
 
         // Get base instructions and available tutorials
         let available_tutorials = Self::get_available_tutorials();

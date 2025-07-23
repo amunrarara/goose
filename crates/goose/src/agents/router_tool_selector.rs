@@ -1,4 +1,4 @@
-use mcp_core::tool::Tool;
+use rmcp::model::Tool;
 use mcp_core::ToolError;
 use rmcp::model::Content;
 
@@ -128,7 +128,7 @@ impl RouterToolSelector for VectorToolSelector {
             .map(|tool| {
                 let schema_str = serde_json::to_string_pretty(&tool.input_schema)
                     .unwrap_or_else(|_| "{}".to_string());
-                format!("{} {} {}", tool.name, tool.description, schema_str)
+                format!("{} {:?} {}", tool.name, tool.description, schema_str)
             })
             .collect();
 

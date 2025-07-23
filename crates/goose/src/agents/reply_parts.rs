@@ -15,7 +15,7 @@ use crate::providers::toolshim::{
     modify_system_prompt_for_tool_json, OllamaInterpreter,
 };
 use crate::session;
-use mcp_core::tool::Tool;
+use rmcp::model::Tool;
 
 use super::super::agents::Agent;
 

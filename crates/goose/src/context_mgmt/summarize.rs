@@ -220,7 +220,7 @@ mod tests {
     use crate::providers::base::{Provider, ProviderMetadata, ProviderUsage, Usage};
     use crate::providers::errors::ProviderError;
     use chrono::Utc;
-    use mcp_core::tool::Tool;
+    use rmcp::model::Tool;
     use mcp_core::ToolCall;
     use rmcp::model::Role;
     use rmcp::model::{AnnotateAble, Content, RawTextContent};

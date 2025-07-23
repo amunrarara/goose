@@ -5,16 +5,16 @@ use crate::message::{Message, MessageContent, ToolRequest};
 use crate::providers::base::Provider;
 use chrono::Utc;
 use indoc::indoc;
-use mcp_core::tool::Tool;
-use mcp_core::tool::ToolAnnotations;
+use rmcp::model::{Tool, ToolAnnotations};
+use rmcp::object;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::collections::HashSet;
 use std::sync::Arc;
 
 /// Creates the tool definition for checking read-only permissions.
 fn create_read_only_tool() -> Tool {
-    Tool::new(
+    let tool = Tool::new(
         "platform__tool_by_tool_permission".to_string(),
         indoc! {r#"
             Analyze the tool requests and determine which ones perform read-only operations.
@@ -45,7 +45,7 @@ fn create_read_only_tool() -> Tool {
             Use this analysis to generate the list of tools performing read-only operations from the provided tool requests.
         "#}
         .to_string(),
-        json!({
+        object!({
             "type": "object",
             "properties": {
                 "read_only_tools": {
@@ -57,15 +57,16 @@ fn create_read_only_tool() -> Tool {
                 }
             },
             "required": []
-        }),
-        Some(ToolAnnotations {
-                title: Some("Check tool operation".to_string()),
-                read_only_hint: true,
-                destructive_hint: false,
-                idempotent_hint: false,
-                open_world_hint: false,
-            }),
-    )
+        })
+    );
+
+    tool.annotate(ToolAnnotations {
+        title: Some("Check tool operation".to_string()),
+        read_only_hint: Option::from(true),
+        destructive_hint: Option::from(false),
+        idempotent_hint: Option::from(false),
+        open_world_hint: Option::from(false)
+    })
 }
 
 /// Builds the message to be sent to the LLM for detecting read-only operations.
@@ -266,9 +267,8 @@ mod tests {
     use crate::providers::base::{Provider, ProviderMetadata, ProviderUsage, Usage};
     use crate::providers::errors::ProviderError;
     use chrono::Utc;
-    use mcp_core::ToolCall;
-    use mcp_core::{tool::Tool, ToolResult};
-    use rmcp::model::Role;
+    use mcp_core::{ToolCall, ToolResult};
+    use rmcp::model::{Role, Tool};
     use serde_json::json;
     use tempfile::NamedTempFile;
 
