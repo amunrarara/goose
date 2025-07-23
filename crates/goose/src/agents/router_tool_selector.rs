@@ -128,7 +128,7 @@ impl RouterToolSelector for VectorToolSelector {
             .map(|tool| {
                 let schema_str = serde_json::to_string_pretty(&tool.input_schema)
                     .unwrap_or_else(|_| "{}".to_string());
-                format!("{} {:?} {}", tool.name, tool.description, schema_str)
+                format!("{} {} {}", tool.name, tool.description.as_ref().map(|d| d.as_ref()).unwrap_or_default(), schema_str)
             })
             .collect();
 
@@ -154,8 +154,8 @@ impl RouterToolSelector for VectorToolSelector {
                 let schema_str = serde_json::to_string_pretty(&tool.input_schema)
                     .unwrap_or_else(|_| "{}".to_string());
                 crate::agents::tool_vectordb::ToolRecord {
-                    tool_name: tool.name.clone(),
-                    description: tool.description.clone(),
+                    tool_name: tool.name.to_string(),
+                    description: tool.description.as_ref().map(|d| d.to_string()).unwrap_or_default(),
                     schema: schema_str,
                     vector,
                     extension_name: extension_name.to_string(),
@@ -305,7 +305,7 @@ impl RouterToolSelector for LLMToolSelector {
             let tool_string = format!(
                 "Tool: {}\nDescription: {}\nSchema: {}",
                 tool.name,
-                tool.description,
+                tool.description.as_ref().map(|d| d.as_ref()).unwrap_or_default(),
                 serde_json::to_string_pretty(&tool.input_schema)
                     .unwrap_or_else(|_| "{}".to_string())
             );

@@ -411,7 +411,18 @@ pub async fn configure_provider_dialog() -> Result<bool, Box<dyn Error>> {
         .complete(
             "You are an AI agent called Goose. You use tools of connected extensions to solve problems.",
             &messages,
-            &tools
+            &tools.into_iter().map(|t| rmcp::model::Tool {
+                name: t.name.into(),
+                description: Some(std::borrow::Cow::Owned(t.description)),
+                input_schema: std::sync::Arc::new(t.input_schema.as_object().unwrap().clone()),
+                annotations: t.annotations.map(|a| rmcp::model::ToolAnnotations {
+                    title: a.title,
+                    read_only_hint: Some(a.read_only_hint),
+                    destructive_hint: Some(a.destructive_hint),
+                    idempotent_hint: Some(a.idempotent_hint),
+                    open_world_hint: Some(a.open_world_hint),
+                }),
+            }).collect::<Vec<_>>()
         )
         .await;
 
@@ -1270,7 +1281,7 @@ pub async fn configure_tool_permissions_dialog() -> Result<(), Box<dyn Error>> {
         .map(|tool| {
             ToolInfo::new(
                 &tool.name,
-                &tool.description,
+                &tool.description.as_ref().map(|d| d.as_ref()).unwrap_or_default(),
                 get_parameter_names(&tool),
                 permission_manager.get_user_permission(&tool.name),
             )

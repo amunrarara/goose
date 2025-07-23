@@ -4,6 +4,7 @@ use indoc::formatdoc;
 use mcp_core::{ToolCall, ToolError};
 use rmcp::model::{Content, Tool, ToolAnnotations};
 use serde_json::Value;
+use std::sync::Arc;
 
 pub const FINAL_OUTPUT_TOOL_NAME: &str = "recipe__final_output";
 pub const FINAL_OUTPUT_CONTINUATION_MESSAGE: &str =
@@ -61,7 +62,7 @@ impl FinalOutputTool {
         Tool::new(
             FINAL_OUTPUT_TOOL_NAME.to_string(),
             instructions,
-            self.response.json_schema.as_ref().unwrap().clone()
+            Arc::new(self.response.json_schema.as_ref().unwrap().as_object().unwrap().clone())
         ).annotate(ToolAnnotations {
             title: Some("Final Output".to_string()),
             read_only_hint: Some(false),

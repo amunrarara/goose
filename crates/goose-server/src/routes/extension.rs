@@ -259,7 +259,12 @@ async fn add_extension(
             instructions,
         } => ExtensionConfig::Frontend {
             name,
-            tools,
+            tools: tools.into_iter().map(|t| rmcp::model::Tool {
+                name: t.name.into(),
+                description: Some(std::borrow::Cow::Owned(t.description)),
+                input_schema: std::sync::Arc::new(t.input_schema.as_object().unwrap().clone()),
+                annotations: None,
+            }).collect(),
             instructions,
             bundled: None,
         },

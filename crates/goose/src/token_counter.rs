@@ -79,7 +79,7 @@ impl AsyncTokenCounter {
             for tool in tools {
                 func_token_count += func_init;
                 let name = &tool.name;
-                let description = &tool.description.trim_end_matches('.');
+                let description = &tool.description.as_ref().map(|d| d.as_ref()).unwrap_or_default().trim_end_matches('.');
 
                 // Note: the separator (:) is likely tokenized with adjacent tokens, so we use original approach for accuracy
                 let line = format!("{}:{}", name, description);
@@ -225,7 +225,7 @@ impl TokenCounter {
             for tool in tools {
                 func_token_count += func_init; // Add tokens for start of each function
                 let name = &tool.name;
-                let description = &tool.description.trim_end_matches('.');
+                let description = &tool.description.as_ref().map(|d| d.as_ref()).unwrap_or_default().trim_end_matches('.');
                 let line = format!("{}:{}", name, description);
                 func_token_count += self.count_tokens(&line); // Add tokens for name and description
 

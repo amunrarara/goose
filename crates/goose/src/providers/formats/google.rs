@@ -131,19 +131,18 @@ pub fn format_tools(tools: &[Tool]) -> Vec<Value> {
         .map(|tool| {
             let mut parameters = Map::new();
             parameters.insert("name".to_string(), json!(tool.name));
-            parameters.insert("description".to_string(), json!(tool.description));
-            if let Some(tool_input_schema) = tool.input_schema {
-                // Only add the parameters key if the tool schema has non-empty properties.
-                if tool_input_schema
-                    .get("properties")
-                    .and_then(|v| v.as_object())
-                    .is_some_and(|p| !p.is_empty())
-                {
-                    parameters.insert(
-                        "parameters".to_string(),
-                        process_map(tool_input_schema, None),
-                    );
-                }
+            parameters.insert("description".to_string(), json!(tool.description.as_ref().map(|d| d.as_ref()).unwrap_or_default()));
+            let tool_input_schema = &tool.input_schema;
+            // Only add the parameters key if the tool schema has non-empty properties.
+            if tool_input_schema
+                .get("properties")
+                .and_then(|v| v.as_object())
+                .is_some_and(|p| !p.is_empty())
+            {
+                parameters.insert(
+                    "parameters".to_string(),
+                    process_map(tool_input_schema, None),
+                );
             }
             json!(parameters)
         })

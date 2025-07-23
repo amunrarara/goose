@@ -1220,7 +1220,7 @@ impl Agent {
             .map(|tool| {
                 ToolInfo::new(
                     &tool.name,
-                    &tool.description.unwrap_or_default(),
+                    &tool.description.as_ref().map(|d| d.as_ref()).unwrap_or_default(),
                     get_parameter_names(&tool),
                     None,
                 )

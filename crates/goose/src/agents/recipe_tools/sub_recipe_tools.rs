@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::fs;
+use std::sync::Arc;
 
 use anyhow::Result;
 use rmcp::model::{Tool, ToolAnnotations};
@@ -27,7 +28,7 @@ pub fn create_sub_recipe_task_tool(sub_recipe: &SubRecipe) -> Tool {
             After creating the tasks and execution_mode is provided, pass them to the task executor to run these tasks",
             sub_recipe.name
         ),
-        input_schema
+        Arc::new(input_schema.as_object().unwrap().clone())
     );
 
     tool.annotate(ToolAnnotations {

@@ -184,9 +184,9 @@ pub fn to_bedrock_tool(tool: &Tool) -> Result<bedrock::Tool> {
     Ok(bedrock::Tool::ToolSpec(
         bedrock::ToolSpecification::builder()
             .name(tool.name.to_string())
-            .description(tool.description.to_string())
+            .description(tool.description.as_ref().map(|d| d.to_string()).unwrap_or_default())
             .input_schema(bedrock::ToolInputSchema::Json(to_bedrock_json(
-                &tool.input_schema,
+                &Value::Object(tool.input_schema.as_ref().clone()),
             )))
             .build()?,
     ))
